@@ -18,7 +18,8 @@ app.use(helmet());
 const baseAllowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
-  "https://recall-c-frontend.vercel.app"
+  "https://recall-c-frontend.vercel.app",
+  "https://recall-c-frontend-rery73lya-govindpothurajus-projects.vercel.app"
 ];
 
 if (config.clientUrl) {
