@@ -1,0 +1,36 @@
+{
+  "name": "recallc-backend",
+  "version": "1.0.0",
+  "description": "RecallC Backend - Learn Today. Recall Tomorrow.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --test tests/**/*.test.js",
+    "benchmark": "node tests/benchmark.js",
+    "seed": "node scripts/seed.js",
+    "test:apis": "node scripts/test-and-seed-all-apis.js"
+  },
+  "keywords": [
+    "recallc",
+    "spaced-repetition",
+    "revision",
+    "learning"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.5"
+  },
+  "devDependencies": {
+    "mongodb-memory-server": "^10.1.4",
+    "supertest": "^7.0.0"
+  }
+}
