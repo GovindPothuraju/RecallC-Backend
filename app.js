@@ -15,10 +15,20 @@ app.use(helmet());
 
 // Cross-Origin Resource Sharing
 // Middleware
-const allowedOrigins = [
+const baseAllowedOrigins = [
   "http://localhost:5173",
-  "http://localhost:5174"
+  "http://localhost:5174",
+  "https://recall-c-frontend.vercel.app"
 ];
+
+if (config.clientUrl) {
+  const envOrigins = config.clientUrl.split(',').map((s) => s.trim().replace(/\/$/, '')).filter(Boolean);
+  for (const o of envOrigins) {
+    if (!baseAllowedOrigins.includes(o)) {
+      baseAllowedOrigins.push(o);
+    }
+  }
+}
 
 app.use(
   cors({
@@ -27,7 +37,12 @@ app.use(
         return callback(null, true);
       }
 
-      if (allowedOrigins.includes(origin)) {
+      const normalizedOrigin = origin.replace(/\/$/, "");
+      const isAllowed = baseAllowedOrigins.some(
+        (allowed) => allowed.replace(/\/$/, "") === normalizedOrigin
+      );
+
+      if (isAllowed) {
         return callback(null, true);
       }
 
