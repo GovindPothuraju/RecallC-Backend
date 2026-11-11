@@ -11,7 +11,11 @@ const routes = require('./routes');
 const app = express();
 
 // Security Headers
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' }
+  })
+);
 
 // Cross-Origin Resource Sharing
 // Middleware
@@ -19,7 +23,7 @@ const baseAllowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
   "https://recall-c-frontend.vercel.app",
-  "https://recall-c-frontend-rery73lya-govindpothurajus-projects.vercel.app"
+  "https://recallc-frontend.vercel.app"
 ];
 
 if (config.clientUrl) {
@@ -31,34 +35,53 @@ if (config.clientUrl) {
   }
 }
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin) {
-        return callback(null, true);
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    const normalizedOrigin = origin.replace(/\/$/, "");
+    const isExplicitlyAllowed = baseAllowedOrigins.some(
+      (allowed) => allowed.replace(/\/$/, "") === normalizedOrigin
+    );
+
+    let isVercelDomain = false;
+    try {
+      const host = new URL(normalizedOrigin).hostname;
+      if (host.endsWith('.vercel.app')) {
+        isVercelDomain = true;
       }
+    } catch (_) {}
 
-      const normalizedOrigin = origin.replace(/\/$/, "");
-      const isAllowed = baseAllowedOrigins.some(
-        (allowed) => allowed.replace(/\/$/, "") === normalizedOrigin
-      );
+    if (isExplicitlyAllowed || isVercelDomain) {
+      return callback(null, true);
+    }
 
-      if (isAllowed) {
-        return callback(null, true);
-      }
+    console.log("Blocked CORS origin:", origin);
 
-      console.log("Blocked CORS origin:", origin);
+    return callback(new Error("Not allowed by CORS"));
+  },
 
-      return callback(new Error("Not allowed by CORS"));
-    },
+  credentials: true,
 
-    credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
 
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "X-Timezone",
+    "Accept",
+    "Origin",
+    "Access-Control-Request-Method",
+    "Access-Control-Request-Headers"
+  ],
 
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 // Body parsers
 app.use(express.json({ limit: '1mb' }));
